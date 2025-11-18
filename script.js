@@ -76,30 +76,30 @@ function displayWeatherInfo(data) {
     card.style.display = 'flex';
     card.style.flexDirection = 'column';
 
-    const title = document.createElement('h3');
-    title.textContent = data.resolvedName || data.name || 'Weather';
+    const cityDisplay = document.createElement('h3');
+    cityDisplay.textContent = data.resolvedName || data.name || 'Weather';
 
-    const emoji = document.createElement('div');
+    const weatherEmoji = document.createElement('div');
     emoji.textContent = getWeatherEmoji(data.weather && data.weather[0] && data.weather[0].id);
     emoji.style.fontSize = '2rem';
 
-    const temp = document.createElement('p');
-    temp.textContent = `Temperature: ${Math.round(data.main.temp)}°C`;
+    const tempDisplay = document.createElement('p');
+    tempDisplay.textContent = `Temperature: ${Math.round(data.main.temp)}°C`;
 
-    const desc = document.createElement('p');
-    desc.textContent = `Conditions: ${data.weather && data.weather[0] ? data.weather[0].description : 'N/A'}`;
+    const desDisplay = document.createElement('p');
+    desDisplay.textContent = `Conditions: ${data.weather && data.weather[0] ? data.weather[0].description : 'N/A'}`;
 
-    const humidity = document.createElement('p');
-    humidity.textContent = `Humidity: ${data.main.humidity}%`;
+    const HumidityDisplay = document.createElement('p');
+    HumidityDisplay.textContent = `Humidity: ${data.main.humidity}%`;
 
     const wind = document.createElement('p');
     wind.textContent = `Wind: ${data.wind.speed} m/s`;
 
-    card.appendChild(title);
-    card.appendChild(emoji);
-    card.appendChild(temp);
-    card.appendChild(desc);
-    card.appendChild(humidity);
+    card.appendChild(cityDisplay);
+    card.appendChild(weatherEmoji);
+    card.appendChild(tempDisplay);
+    card.appendChild(desDisplay);
+    card.appendChild(HumidityDisplay);
     card.appendChild(wind);
 }
 
