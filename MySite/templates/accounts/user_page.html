@@ -1,0 +1,61 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APEX</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body class="body1">
+    <header>
+        <nav class="navbar">
+            <div class="navbar__container">
+                <ul></ul>
+            <a href="userpage.html" id="navbar__logo">APEX</a>
+            <ul class="navbar__menu">
+                <li><button onclick="Sendissueactivate()">Send Issue</button></li>
+                <li><button onclick="Seeissuesactivate()">See the issues</button></li>
+                <li class="navbar__item">
+                    <select name="lang" id="lang-select" class="gg">
+                        <option value="ENG">ENG</option>
+                        <option value="RUS">RUS</option>
+                        <option value="KZ">KZ</option>
+                    </select>
+                </li>
+                <li class="navbar__btnm">
+                    <a onclick="Cabinet()" class="ggg"><img src="{% static 'images/undraw_friendly-guy-avatar_ibbp.svg' %}" alt=""></a>
+                </li>
+            </ul>
+        </div>
+        </nav>
+    </header>
+
+    <div class="Foryou">
+        <h1>For you:</h1>
+    </div>
+
+    <div class="feed"></div>
+    <script src="{% static 'script.js' %}"></script>
+
+    <div class="post" style="display: none;">
+        <div class="post__container">
+            <h1>Report the problem</h1>
+            <form id="complaintForm" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" id="image" name="image" accept="image/*" required>
+                <input type="text" id="location" name="location" placeholder="Enter location" required>
+                <textarea id="description" name="description" placeholder="Describe the problem" required></textarea>
+                <button type="submit">Submit Complaint</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
