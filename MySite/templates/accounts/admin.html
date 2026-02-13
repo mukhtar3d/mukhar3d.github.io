@@ -1,0 +1,331 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - APEX</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            color: black;
+        }
+        table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        table tr:hover {
+            background: #f5f5f5;
+        }
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 4px;
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-delete:hover {
+            background: #c82333;
+        }
+        .btn-add {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+        }
+        .btn-add:hover {
+            background: #218838;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card h3 {
+            margin: 0;
+            font-size: 32px;
+        }
+        .stat-card p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="header">
+            <div>
+                <h1>🛡️ Admin Dashboard</h1>
+                <p>Welcome, {{ user_id }} ({{ role }})</p>
+            </div>
+            <a href="{% url 'index' %}" class="logout-btn">← Back to Home</a>
+        </div>
+
+        <div id="message-container"></div>
+
+        <!-- Statistics -->
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="total-users">0</h3>
+                <p>Total Users</p>
+            </div>
+            <div class="stat-card" style="background: #28a745;">
+                <h3 id="admin-users">0</h3>
+                <p>Admin Users</p>
+            </div>
+            <div class="stat-card" style="background: #17a2b8;">
+                <h3 id="moderator-users">0</h3>
+                <p>Moderators</p>
+            </div>
+            <div class="stat-card" style="background: #ffc107;">
+                <h3 id="regular-users">0</h3>
+                <p>Regular Users</p>
+            </div>
+        </div>
+
+        <!-- Add User Section -->
+        <div class="section">
+            <h2>➕ Add New User</h2>
+            <form id="add-user-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="new-user-id">User ID (12 digits)</label>
+                    <input type="text" id="new-user-id" name="user_id" placeholder="123456789012" pattern="\d{12}" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-password">Password</label>
+                    <input type="password" id="new-password" name="password" placeholder="At least 4 characters" minlength="4" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-role">Role</label>
+                    <select id="new-role" name="role" required>
+                        <option value="user">User</option>
+                        <option value="moderator">Moderator</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-add">Add User</button>
+            </form>
+        </div>
+
+        <!-- Users List Section -->
+        <div class="section">
+            <h2>👥 User Management</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table-body">
+                    <tr>
+                        <td colspan="3" style="text-align: center;">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Load users on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUsers();
+        });
+
+        function loadUsers() {
+            fetch('/api/users/')
+                .then(response => response.json())
+                .then(users => {
+                    const tbody = document.getElementById('users-table-body');
+                    tbody.innerHTML = '';
+                    
+                    let adminCount = 0;
+                    let moderatorCount = 0;
+                    let userCount = 0;
+                    
+                    users.forEach(user => {
+                        if (user.role === 'admin') adminCount++;
+                        else if (user.role === 'moderator') moderatorCount++;
+                        else userCount++;
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td><strong>${user.user_id}</strong></td>
+                            <td><span style="background: #e9ecef; padding: 4px 8px; border-radius: 4px;">${user.role.toUpperCase()}</span></td>
+                            <td>
+                                <button class="btn btn-delete" onclick="deleteUser('${user.user_id}')">🗑️ Delete</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                    
+                    // Update stats
+                    document.getElementById('total-users').textContent = users.length;
+                    document.getElementById('admin-users').textContent = adminCount;
+                    document.getElementById('moderator-users').textContent = moderatorCount;
+                    document.getElementById('regular-users').textContent = userCount;
+                })
+                .catch(error => {
+                    console.error('Error loading users:', error);
+                    document.getElementById('users-table-body').innerHTML = '<tr><td colspan="3" style="color: red;">Error loading users</td></tr>';
+                });
+        }
+
+        // Add user form
+        document.getElementById('add-user-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('/api/users/add/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('User added successfully!', 'success');
+                    this.reset();
+                    loadUsers();
+                } else {
+                    showMessage('Error: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Error adding user', 'error');
+            });
+        });
+
+        function deleteUser(userId) {
+            if (!confirm('Are you sure you want to delete user ' + userId + '?')) return;
+            
+            const formData = new FormData();
+            formData.append('user_id', userId);
+            
+            fetch('/api/users/delete/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('User deleted successfully!', 'success');
+                    loadUsers();
+                } else {
+                    showMessage('Error: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Error deleting user', 'error');
+            });
+        }
+
+        function showMessage(message, type) {
+            const container = document.getElementById('message-container');
+            const div = document.createElement('div');
+            div.className = type === 'success' ? 'success' : 'error';
+            div.textContent = message;
+            container.innerHTML = '';
+            container.appendChild(div);
+            
+            setTimeout(() => {
+                div.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
